@@ -1,0 +1,11 @@
+# No external dependencies required.
+# This project uses only the Python standard library:
+#   - hashlib    (file content hashing)
+#   - os         (file metadata, deletion, directory walking)
+#   - pathlib    (path manipulation)
+#   - argparse   (command-line parsing)
+#   - csv        (CSV export)
+#   - json       (JSON export)
+#   - sys        (exit / stderr)
+#
+# Python 3.8+ is required.
