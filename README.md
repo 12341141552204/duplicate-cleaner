@@ -1,231 +1,113 @@
-# :wastebasket: Duplicate File Cleaner
+<div align="center">
 
-Find and remove duplicate files - content hash, batch delete, dry run.
+# 🗑️ PhotoDedupe
 
-![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)
-![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
-![MIT License](https://img.shields.io/badge/license-MIT-green.svg)
-![No Dependencies](https://img.shields.io/badge/dependencies-0-success.svg)
+### 摄影师专用去重工具 — 按内容比对 · 连拍清理 · 硬盘释放
 
-Duplicate File Cleaner is a lightweight, dependency-free command-line tool that finds and removes duplicate files on your system. It compares files by their content hash (SHA-256 by default) or by filename, lets you preview deletions with a dry run, and can export the results to TXT, JSON, or CSV.
+A duplicate file cleaner designed for photographers: find identical RAW/JPG by content hash, batch clean up duplicate shots.
 
----
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
+[![Platform](https://img.shields.io/badge/Platform-Windows-green.svg)](https://github.com/12341141552204/duplicate-cleaner)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/12341141552204/duplicate-cleaner)](https://github.com/12341141552204/duplicate-cleaner)
 
-## Table of Contents
+</div>
 
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Output Examples](#output-examples)
-- [Keep Strategies](#keep-strategies)
-- [Export Formats](#export-formats)
-- [Contributing](#contributing)
-- [License](#license)
-- [Sponsor](#sponsor)
+## 🎯 为什么摄影师需要这个工具
 
----
+一场活动拍了 500 张，连拍导致几十张内容几乎相同？修图导出了两个版本分不清？硬盘被重复照片占满？
 
-## Features
+**PhotoDedupe 帮你：**
+- 🔍 按文件内容（MD5）精确比对，找到完全相同的照片
+- 📊 一键统计重复照片占用的空间
+- 🗑️ 安全删除：先预览再操作，误删可恢复（回收站）
+- 📋 导出重复清单，方便检查
 
-| Feature | Description |
+## ✨ 功能特性
+
+| 功能 | 说明 |
 |---|---|
-| Content hash scan | Find duplicates by SHA-256/MD5/SHA1 file content comparison |
-| Filename scan | Find files with the same name in different directories (`--by-name`) |
-| Batch delete | Remove all duplicates at once, keeping one copy per group |
-| Dry run | Preview which files would be deleted without actually deleting (`--dry-run`) |
-| Keep strategies | Choose which copy to keep: first, newest, or oldest (`--keep`) |
-| Export | Save the duplicate list to TXT, JSON, or CSV |
-| Size filter | Ignore small files below a size threshold (`-m`) |
-| Recursive | Scan subdirectories by default; opt out with `--no-recursive` |
-| Zero dependencies | Pure Python standard library only |
+| 精确扫描 | 按 MD5 内容比对，文件名不同也能找到 |
+| 递归扫描 | 自动扫描子文件夹 |
+| 预览模式 | 先看重复列表，不删除任何文件 |
+| 安全删除 | 删除到回收站，不是永久删除 |
+| 导出报告 | 重复清单导出为文本文件 |
+| 空间统计 | 显示重复文件占用了多少硬盘空间 |
 
-## Installation
-
-No installation or dependencies required. Just clone the repository and run with Python 3.8+.
+## 📦 安装
 
 ```bash
-git clone https://github.com/yourusername/duplicate-cleaner.git
-cd duplicate-cleaner
+git clone https://github.com/12341141552204/duplicate-cleaner.git
+# 无需额外依赖
 ```
 
-Verify Python version:
+## 🚀 使用方法
+
+### 1. 扫描重复照片
 
 ```bash
-python --version   # Python 3.8 or higher
+# 扫描整个文件夹
+python main.py scan "D:\婚礼拍摄\2026-08-29"
+
+# 递归扫描子文件夹
+python main.py scan "D:\婚礼拍摄" --recursive
 ```
 
-## Usage
-
-### Scan for duplicates (by content hash)
+### 2. 预览删除（安全模式）
 
 ```bash
-python main.py scan /path/to/dir
+# 只看不删，确认重复列表
+python main.py delete "D:\婚礼拍摄\2026-08-29" --dry-run
 ```
 
-### Scan for duplicates by filename
+### 3. 执行删除
 
 ```bash
-python main.py scan /path/to/dir --by-name
+# 删除重复文件（保留每个组的第一张）
+python main.py delete "D:\婚礼拍摄\2026-08-29"
 ```
 
-### Delete duplicates with a dry-run preview
+### 4. 导出报告
 
 ```bash
-python main.py delete /path/to/dir --dry-run
+python main.py export "D:\婚礼拍摄" -o "重复清单.txt"
 ```
 
-### Delete duplicates (keeping the first copy)
+## 📖 命令参考
 
-```bash
-python main.py delete /path/to/dir
-```
-
-### Delete duplicates, keep the newest copy
-
-```bash
-python main.py delete /path/to/dir --keep newest
-```
-
-### Export the duplicate list to a file
-
-```bash
-python main.py export /path/to/dir -o duplicates.txt
-```
-
-Export as JSON or CSV:
-
-```bash
-python main.py export /path/to/dir -o duplicates.json
-python main.py export /path/to/dir -o duplicates.csv
-```
-
-### Ignore files smaller than 1 MB, use MD5
-
-```bash
-python main.py scan /path/to/dir -m 1048576 --algorithm md5
-```
-
-### Scan only the top-level directory (no subdirectories)
-
-```bash
-python main.py scan /path/to/dir --no-recursive
-```
-
-### All options
-
-```
-python main.py --help
-```
-
-```
-usage: duplicate-cleaner [-h] {scan,delete,export} ...
-
-Find and remove duplicate files by content hash or filename.
-No dependencies required.
-
-positional arguments:
-  {scan,delete,export}  Available commands
-    scan                Scan a directory and list duplicate files.
-    delete              Delete duplicate files (keep the first).
-    export              Export the duplicate file list to a file.
-```
-
-## Output Examples
-
-Scan a directory:
-
-```
-$ python main.py scan ~/Pictures
-
-Found 2 duplicate group(s) by content hash.
-  Total files scanned:    5
-  Duplicate files found:   2
-
-Group 1 (2 files):
-  KEEP   /home/user/Pictures/vacation/sunset.jpg (3.2 MB)
-  DELETE /home/user/Pictures/backup/sunset_copy.jpg (3.2 MB)
-
-Group 2 (3 files):
-  KEEP   /home/user/Pictures/photo.jpg (1.5 MB)
-  DELETE /home/user/Pictures/trip/photo.jpg (1.5 MB)
-  DELETE /home/user/Pictures/old/photo.jpg (1.5 MB)
-
-Potential wasted space: 6.2 MB
-```
-
-Delete with dry run:
-
-```
-$ python main.py delete ~/Documents --dry-run
-
-Found 1 duplicate group(s) by content hash.
-  Total files scanned:    2
-  Duplicate files found:   1
-
-Group 1 (2 files):
-  KEEP   /home/user/Documents/report.pdf (512.0 KB)
-  DELETE /home/user/Documents/copy/report.pdf (512.0 KB)
-
---- DRY RUN (no files will be deleted) ---
-  [DRY RUN] Would delete: /home/user/Documents/copy/report.pdf (512.0 KB)
-
-Would delete 1 file(s), freeing 512.0 KB.
-```
-
-Delete (real):
-
-```
-$ python main.py delete ~/Documents
-
-Found 1 duplicate group(s) by content hash.
-  Total files scanned:    2
-  Duplicate files found:   1
-
-Group 1 (2 files):
-  KEEP   /home/user/Documents/report.pdf (512.0 KB)
-  DELETE /home/user/Documents/copy/report.pdf (512.0 KB)
-
---- Deleting duplicates ---
-  Deleted: /home/user/Documents/copy/report.pdf (512.0 KB)
-
-Deleted 1 file(s), freeing 512.0 KB.
-Done.
-```
-
-## Keep Strategies
-
-When deleting duplicates, you can choose which copy to keep with `--keep`:
-
-| Strategy | Description |
+| 命令 | 用途 |
 |---|---|
-| `first` (default) | Keep the first file in alphabetical path order |
-| `newest` | Keep the most recently modified file |
-| `oldest` | Keep the least recently modified file |
+| `scan <目录>` | 扫描重复文件 |
+| `scan <目录> --recursive` | 递归扫描 |
+| `delete <目录> --dry-run` | 预览删除 |
+| `delete <目录>` | 执行删除 |
+| `export <目录> -o <文件>` | 导出报告 |
 
-```bash
-python main.py delete ~/Pictures --keep newest
-```
+## 💡 使用场景
 
-## Export Formats
+| 场景 | 操作 |
+|---|---|
+| 连拍清理 | `scan` → `delete --dry-run` → `delete` |
+| 硬盘清理 | `scan` + `--recursive` 全盘扫描 |
+| 修图去重 | `scan` 找出重复导出的图片 |
+| 交接前检查 | `export` 导出清单确认 |
 
-| Format | Extension | Description |
+## 🤝 贡献
+
+欢迎提交 Issue 和 PR！请阅读 [贡献指南](CONTRIBUTING.md)。
+
+## 💖 赞助
+
+如果这个工具帮你释放了硬盘空间，请考虑赞助：
+
+| 方案 | 月费 | 权益 |
 |---|---|---|
-| TXT | `.txt` | Human-readable report with KEEP/DELETE tags |
-| JSON | `.json` | Structured data with group, keep, and delete fields |
-| CSV | `.csv` | Tabular format with group, action, and filepath columns |
+| 🥤 随手一杯 | ¥5 | README 署名 + 月度进展 |
+| 🚀 催更选手 | ¥15 | 提前体验 + 优先排功能 |
+| 👑 金主爸爸 | ¥50 | 功能优先建议 + 项目挂名 |
 
-The format is inferred from the output file extension. Unrecognised extensions default to TXT.
+👉 [爱发电赞助](https://afdian.com/a/JingJingZ)
 
-## Contributing
+## 📄 许可证
 
-Contributions are welcome! Please read the [Contributing Guide](CONTRIBUTING.md) for guidelines on submitting issues, feature requests, and pull requests.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Sponsor
-
-If you find this project helpful, please consider supporting it:
-
-[![Sponsor on Afdian](https://img.shields.io/badge/Sponsor-Afdian-orange.svg)](https://afdian.com/a/JingJingZ)
+[MIT License](LICENSE) - 自由使用，欢迎商用
